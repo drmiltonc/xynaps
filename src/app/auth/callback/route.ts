@@ -5,14 +5,46 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
+  const error = requestUrl.searchParams.get('error');
+  const errorDescription = requestUrl.searchParams.get('error_description');
 
-  if (code) {
-    const supabase = createRouteHandlerClient({ cookies });
-    
-    // Exchange the code for a session
-    await supabase.auth.exchangeCodeForSession(code);
+  if (error) {
+    // Handle OAuth error
+    const errorMessage = errorDescription || 'Authentication failed';
+    const redirectUrl = new URL(requestUrl.origin);
+    redirectUrl.searchParams.set('auth_error', error);
+    redirectUrl.searchParams.set('auth_error_description', errorMessage);
+    return NextResponse.redirect(redirectUrl);
   }
 
-  // URL to redirect to after sign in process completes
+  if (code) {
+    try {
+      const supabase = createRouteHandlerClient({ cookies });
+      
+      // Exchange the code for a session
+      const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+      
+      if (exchangeError) {
+        console.error('Error exchanging code for session:', exchangeError);
+        const redirectUrl = new URL(requestUrl.origin);
+        redirectUrl.searchParams.set('auth_error', 'session_exchange_failed');
+        redirectUrl.searchParams.set('auth_error_description', 'Failed to complete authentication');
+        return NextResponse.redirect(redirectUrl);
+      }
+
+      // Success - redirect to dashboard
+      const redirectUrl = new URL(`${requestUrl.origin}/dashboard`);
+      redirectUrl.searchParams.set('auth_success', 'true');
+      return NextResponse.redirect(redirectUrl);
+    } catch (error) {
+      console.error('Error in OAuth callback:', error);
+      const redirectUrl = new URL(requestUrl.origin);
+      redirectUrl.searchParams.set('auth_error', 'callback_error');
+      redirectUrl.searchParams.set('auth_error_description', 'Authentication callback failed');
+      return NextResponse.redirect(redirectUrl);
+    }
+  }
+
+  // No code or error - redirect to home
   return NextResponse.redirect(requestUrl.origin);
 }

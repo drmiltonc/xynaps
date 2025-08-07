@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase/client';
+import { useNotifications } from './useNotifications';
 
 export interface AuthUser {
   id: string;
@@ -18,6 +19,7 @@ export function useAuth() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const { showSuccess, showError } = useNotifications();
 
   useEffect(() => {
     // Get initial session
@@ -82,10 +84,14 @@ export function useAuth() {
 
       if (error) {
         console.error('Error signing in with Google:', error);
+        showError('Authentication Error', 'Failed to sign in with Google. Please try again.');
         throw error;
       }
+      
+      showSuccess('Redirecting...', 'Redirecting to Google for authentication.');
     } catch (error) {
       console.error('Error signing in with Google:', error);
+      showError('Authentication Error', 'Failed to sign in with Google. Please try again.');
       throw error;
     }
   };
@@ -101,10 +107,14 @@ export function useAuth() {
 
       if (error) {
         console.error('Error signing in with Microsoft:', error);
+        showError('Authentication Error', 'Failed to sign in with Microsoft. Please try again.');
         throw error;
       }
+      
+      showSuccess('Redirecting...', 'Redirecting to Microsoft for authentication.');
     } catch (error) {
       console.error('Error signing in with Microsoft:', error);
+      showError('Authentication Error', 'Failed to sign in with Microsoft. Please try again.');
       throw error;
     }
   };
@@ -114,10 +124,14 @@ export function useAuth() {
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('Error signing out:', error);
+        showError('Sign Out Error', 'Failed to sign out. Please try again.');
         throw error;
       }
+      
+      showSuccess('Signed Out', 'You have been successfully signed out.');
     } catch (error) {
       console.error('Error signing out:', error);
+      showError('Sign Out Error', 'Failed to sign out. Please try again.');
       throw error;
     }
   };
