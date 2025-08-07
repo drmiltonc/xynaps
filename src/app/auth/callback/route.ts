@@ -8,6 +8,10 @@ export async function GET(request: NextRequest) {
   const error = requestUrl.searchParams.get('error');
   const errorDescription = requestUrl.searchParams.get('error_description');
 
+  console.log('OAuth Callback - URL:', requestUrl.toString());
+  console.log('OAuth Callback - Code:', code);
+  console.log('OAuth Callback - Error:', error);
+
   if (error) {
     // Handle OAuth error
     const errorMessage = errorDescription || 'Authentication failed';
@@ -22,8 +26,12 @@ export async function GET(request: NextRequest) {
     try {
       const supabase = createRouteHandlerClient({ cookies });
       
+      console.log('Exchanging code for session...');
+      
       // Exchange the code for a session
-      const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+      const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+      
+      console.log('Exchange result:', { data, error: exchangeError });
       
       if (exchangeError) {
         console.error('Error exchanging code for session:', exchangeError);
@@ -36,6 +44,7 @@ export async function GET(request: NextRequest) {
       // Success - redirect to dashboard
       const redirectUrl = new URL(`${requestUrl.origin}/dashboard`);
       redirectUrl.searchParams.set('auth_success', 'true');
+      console.log('Redirecting to dashboard:', redirectUrl.toString());
       return NextResponse.redirect(redirectUrl);
     } catch (error) {
       console.error('Error in OAuth callback:', error);
@@ -47,5 +56,6 @@ export async function GET(request: NextRequest) {
   }
 
   // No code or error - redirect to home
+  console.log('No code or error found, redirecting to home');
   return NextResponse.redirect(requestUrl.origin);
 }

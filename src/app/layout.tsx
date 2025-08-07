@@ -4,6 +4,7 @@ import './globals.css';
 import { AuthProvider } from '@/components/providers/AuthProvider';
 import NotificationProvider from '@/components/providers/NotificationProvider';
 import AuthErrorHandler from '@/components/auth/AuthErrorHandler';
+import TokenHandler from '@/components/auth/TokenHandler';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -24,6 +25,7 @@ export default function RootLayout({
           {children}
           <NotificationProvider />
           <AuthErrorHandler />
+          <TokenHandler />
         </AuthProvider>
       </body>
     </html>
