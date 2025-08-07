@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
   if (error) {
     // Handle OAuth error
     const errorMessage = errorDescription || 'Authentication failed';
+    console.error('OAuth Error:', { error, errorDescription });
     const redirectUrl = new URL(requestUrl.origin);
     redirectUrl.searchParams.set('auth_error', error);
     redirectUrl.searchParams.set('auth_error_description', errorMessage);
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest) {
         console.error('Error exchanging code for session:', exchangeError);
         const redirectUrl = new URL(requestUrl.origin);
         redirectUrl.searchParams.set('auth_error', 'session_exchange_failed');
-        redirectUrl.searchParams.set('auth_error_description', 'Failed to complete authentication');
+        redirectUrl.searchParams.set('auth_error_description', exchangeError.message || 'Failed to complete authentication');
         return NextResponse.redirect(redirectUrl);
       }
 

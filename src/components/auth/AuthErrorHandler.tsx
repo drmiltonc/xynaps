@@ -24,8 +24,11 @@ export default function AuthErrorHandler() {
         case 'access_denied':
           errorMessage = 'Access was denied. Please try again.';
           break;
+        case 'server_error':
+          errorMessage = 'Microsoft authentication server error. Please try again.';
+          break;
         case 'session_exchange_failed':
-          errorMessage = 'Failed to complete authentication. Please try again.';
+          errorMessage = authErrorDescription || 'Failed to complete authentication. Please try again.';
           break;
         case 'callback_error':
           errorMessage = 'Authentication callback failed. Please try again.';
