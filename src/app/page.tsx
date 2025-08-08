@@ -19,26 +19,19 @@ export default function HomePage() {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    console.log('Home - Auth state changed:', { mounted, loading, user: !!user });
-  }, [mounted, loading, user]);
-
   // Redirect authenticated users to dashboard
   useEffect(() => {
     if (mounted && !loading && user && !redirecting) {
-      console.log('🔵 Home - User authenticated, redirecting to dashboard');
       setRedirecting(true);
       router.push('/dashboard');
     }
   }, [mounted, loading, user, redirecting, router]);
 
   if (!mounted) {
-    console.log('Home - Not mounted yet');
     return null;
   }
 
   if (loading) {
-    console.log('Home - Showing loading state');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
@@ -48,7 +41,6 @@ export default function HomePage() {
 
   // Show redirect message for authenticated users
   if (user && redirecting) {
-    console.log('Home - Showing redirect state for authenticated user');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -58,8 +50,6 @@ export default function HomePage() {
       </div>
     );
   }
-
-  console.log('Home - Showing landing page, user:', !!user);
 
   return (
     <div className="min-h-screen">

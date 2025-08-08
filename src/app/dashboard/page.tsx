@@ -15,17 +15,11 @@ export default function DashboardPage() {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    console.log('Dashboard - Auth state changed:', { mounted, loading, user: !!user });
-  }, [mounted, loading, user]);
-
   if (!mounted) {
-    console.log('Dashboard - Not mounted yet');
     return null;
   }
 
   if (loading) {
-    console.log('Dashboard - Showing loading state');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
@@ -34,7 +28,6 @@ export default function DashboardPage() {
   }
 
   if (!user) {
-    console.log('🔴 Dashboard - No user found, redirecting to home');
     router.push('/');
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -45,8 +38,6 @@ export default function DashboardPage() {
       </div>
     );
   }
-
-  console.log('✅ Dashboard - User authenticated, showing dashboard');
 
   return (
     <div className="min-h-screen bg-gray-50">

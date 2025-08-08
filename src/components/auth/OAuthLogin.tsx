@@ -4,19 +4,10 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function OAuthLogin() {
-  console.log('🔵 OAuthLogin - Component rendered');
-  
   const { signInWithGoogle, signInWithMicrosoft } = useAuth();
-  
-  console.log('🔵 OAuthLogin - useAuth hook result:', { 
-    signInWithGoogle: !!signInWithGoogle, 
-    signInWithMicrosoft: !!signInWithMicrosoft 
-  });
 
   const handleGoogleLogin = async () => {
     try {
-      console.log('🔵 OAuthLogin - Google button clicked!');
-      console.log('🔵 OAuthLogin - Starting Google OAuth...');
       await signInWithGoogle();
     } catch (error) {
       console.error('🔴 OAuthLogin - Error signing in with Google:', error);
@@ -27,8 +18,6 @@ export default function OAuthLogin() {
 
   const handleMicrosoftLogin = async () => {
     try {
-      console.log('🔵 OAuthLogin - Microsoft button clicked!');
-      console.log('🔵 OAuthLogin - Starting Microsoft OAuth...');
       await signInWithMicrosoft();
     } catch (error) {
       console.error('🔴 OAuthLogin - Error signing in with Microsoft:', error);

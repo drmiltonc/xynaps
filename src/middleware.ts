@@ -3,8 +3,6 @@ import { NextRequest, NextResponse } from 'next/server';
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   
-  console.log('🔵 Middleware - Processing request:', pathname);
-  
   // Skip middleware for static files and API routes
   if (
     pathname.startsWith('/_next') ||
@@ -14,11 +12,9 @@ export function middleware(request: NextRequest) {
     pathname.includes('/runtime/') ||
     /\.[a-zA-Z0-9]+$/.test(pathname)
   ) {
-    console.log('🔵 Middleware - Skipping static file:', pathname);
     return NextResponse.next();
   }
 
-  console.log('✅ Middleware - Request processed successfully');
   return NextResponse.next();
 }
 
