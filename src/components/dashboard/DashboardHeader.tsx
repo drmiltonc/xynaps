@@ -1,6 +1,7 @@
 'use client';
 
-import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
+import { useAuthContext } from '@/components/providers/AuthProvider';
 import { Button } from '@/components/ui/button';
 import AppLogo from '@/components/ui/AppLogo';
 
@@ -9,11 +10,14 @@ interface DashboardHeaderProps {
 }
 
 export default function DashboardHeader({ user }: DashboardHeaderProps) {
-  const { signOut } = useAuth();
+  const router = useRouter();
+  const { signOut } = useAuthContext();
 
   const handleSignOut = async () => {
     try {
       await signOut();
+      // Redirect to home page after successful logout
+      router.push('/');
     } catch (error) {
       console.error('Error signing out:', error);
     }
@@ -30,7 +34,7 @@ export default function DashboardHeader({ user }: DashboardHeaderProps) {
           <div className="flex items-center space-x-4">
             <div className="text-right">
               <div className="text-sm font-medium text-gray-900">
-                {user?.full_name || 'User'}
+                {user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email || 'User'}
               </div>
               <div className="text-xs text-gray-500">
                 {user?.email}

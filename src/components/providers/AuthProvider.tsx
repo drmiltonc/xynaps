@@ -5,13 +5,10 @@ import { useAuth } from '@/hooks/useAuth';
 
 interface AuthContextType {
   user: any;
-  session: any;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
   signInWithMicrosoft: () => Promise<void>;
   signOut: () => Promise<void>;
-  hasPermission: (permission: string) => boolean;
-  hasRole: (role: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

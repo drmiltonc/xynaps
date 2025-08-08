@@ -1,93 +1,68 @@
-import { createServerSupabaseClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthContext } from '@/components/providers/AuthProvider';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
 
-export default async function DashboardPage() {
-  const supabase = createServerSupabaseClient();
-  
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+export default function DashboardPage() {
+  const router = useRouter();
+  const { user, loading } = useAuthContext();
+  const [mounted, setMounted] = useState(false);
 
-  if (!session) {
-    redirect('/');
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    console.log('Dashboard - Auth state changed:', { mounted, loading, user: !!user });
+  }, [mounted, loading, user]);
+
+  if (!mounted) {
+    console.log('Dashboard - Not mounted yet');
+    return null;
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', session.user.id)
-    .single();
+  if (loading) {
+    console.log('Dashboard - Showing loading state');
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    console.log('🔴 Dashboard - No user found, redirecting to home');
+    router.push('/');
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Redirecting to home...</h1>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
+
+  console.log('✅ Dashboard - User authenticated, showing dashboard');
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DashboardHeader user={profile} />
-      
+      <DashboardHeader user={user} />
       <div className="flex">
         <DashboardSidebar />
-        
         <main className="flex-1 p-6">
           <div className="max-w-7xl mx-auto">
             <h1 className="text-3xl font-bold text-gray-900 mb-8">
-              Welcome back, {profile?.full_name || 'User'}!
+              Welcome to Xynaps Dashboard
             </h1>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Quick Actions */}
-              <div className="bg-white p-6 rounded-lg shadow-sm border">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Quick Actions
-                </h3>
-                <div className="space-y-3">
-                  <button className="w-full text-left p-3 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors">
-                    Start Medical Query
-                  </button>
-                  <button className="w-full text-left p-3 rounded-lg bg-green-50 text-green-700 hover:bg-green-100 transition-colors">
-                    Start Clinical Simulation
-                  </button>
-                  <button className="w-full text-left p-3 rounded-lg bg-purple-50 text-purple-700 hover:bg-purple-100 transition-colors">
-                    View History
-                  </button>
-                </div>
-              </div>
-
-              {/* Subscription Status */}
-              <div className="bg-white p-6 rounded-lg shadow-sm border">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Subscription Status
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Plan:</span>
-                    <span className="font-medium">{profile?.subscription_status || 'Free Trial'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Role:</span>
-                    <span className="font-medium capitalize">{profile?.role || 'user'}</span>
-                  </div>
-                  {profile?.subscription_end_date && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Expires:</span>
-                      <span className="font-medium">
-                        {new Date(profile.subscription_end_date).toLocaleDateString()}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Recent Activity */}
-              <div className="bg-white p-6 rounded-lg shadow-sm border">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Recent Activity
-                </h3>
-                <div className="space-y-3">
-                  <div className="text-sm text-gray-600">
-                    No recent activity
-                  </div>
-                </div>
-              </div>
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-semibold mb-4">Your Medical AI Assistant</h2>
+              <p className="text-gray-600">
+                Welcome back! You're now ready to start using Xynaps for your medical consultations and clinical simulations.
+              </p>
             </div>
           </div>
         </main>

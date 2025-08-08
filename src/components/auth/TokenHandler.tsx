@@ -1,53 +1,36 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useNotifications } from '@/hooks/useNotifications';
 
 export default function TokenHandler() {
-  const router = useRouter();
-  const { showSuccess, showError } = useNotifications();
+  const { showSuccess } = useNotifications();
 
   useEffect(() => {
+    console.log('🔵 TokenHandler - Component mounted');
+    
     // Check if there's a token in the URL fragment
     const hash = window.location.hash;
+    console.log('🔵 TokenHandler - URL hash:', hash ? hash.substring(0, 100) + '...' : 'null');
     
     if (hash && hash.includes('access_token')) {
-      console.log('Token found in URL fragment:', hash);
+      console.log('🔵 TokenHandler - Token found, redirecting to dashboard');
       
-      try {
-        // Parse the hash to extract tokens
-        const params = new URLSearchParams(hash.substring(1));
-        const accessToken = params.get('access_token');
-        const refreshToken = params.get('refresh_token');
-        const expiresAt = params.get('expires_at');
-        
-        if (accessToken) {
-          console.log('Processing access token from URL');
-          
-          // Store tokens in localStorage (temporary solution)
-          localStorage.setItem('xynaps_access_token', accessToken);
-          if (refreshToken) {
-            localStorage.setItem('xynaps_refresh_token', refreshToken);
-          }
-          if (expiresAt) {
-            localStorage.setItem('xynaps_expires_at', expiresAt);
-          }
-          
-          // Clear the URL fragment
-          window.history.replaceState({}, document.title, window.location.pathname);
-          
-          // Redirect to dashboard
-          showSuccess('Authentication Successful', 'You have been successfully authenticated.');
-          router.push('/dashboard');
-        }
-      } catch (error) {
-        console.error('Error processing token from URL:', error);
-        showError('Authentication Error', 'Failed to process authentication token.');
-        router.push('/');
-      }
+      // Clear the URL fragment
+      window.history.replaceState({}, document.title, window.location.pathname);
+      console.log('🔵 TokenHandler - URL fragment cleared');
+      
+      // Show success message
+      showSuccess('Authentication Successful', 'You have been successfully authenticated.');
+      console.log('🔵 TokenHandler - Success message shown');
+      
+      // Redirect immediately
+      console.log('🔵 TokenHandler - Redirecting to dashboard...');
+      window.location.href = '/dashboard';
+    } else {
+      console.log('🔵 TokenHandler - No token found in URL fragment');
     }
-  }, [router, showSuccess, showError]);
+  }, [showSuccess]);
 
-  return null; // This component doesn't render anything
+  return null;
 }
